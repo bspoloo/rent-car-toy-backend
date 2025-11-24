@@ -39,6 +39,18 @@ export class RentsService {
     return this.rentRepsitory.save(newRent);
   }
 
+  
+  public async findByUserID(userId: string) : Promise<Rent[]>{
+    const rents = await this.rentRepsitory.find({
+      where: {
+        user_id: userId,
+      },
+      relations: ['user', 'car']
+    });
+
+    return rents;
+  }
+
   public async findAll() {
     return `This action returns all rents`;
   }
