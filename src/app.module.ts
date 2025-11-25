@@ -9,6 +9,7 @@ import { typeormConnectionConfig } from './config/typeorm.config';
 import { StoreModule } from './resources/store/store.module';
 import { RentsModule } from './resources/rents/rents.module';
 import { AuthModule } from './resources/auth/auth.module';
+import { FileModule } from './resources/file/file.module';
 
 
 const envModule = ConfigModule.forRoot({
@@ -24,7 +25,8 @@ const envModule = ConfigModule.forRoot({
     CarModule,
     StoreModule,
     RentsModule,
-    AuthModule
+    AuthModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService],
