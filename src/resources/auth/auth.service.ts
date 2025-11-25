@@ -42,13 +42,16 @@ export class AuthService {
   }
 
   public async login(loginDto: LoginDto): Promise<{ access_token: string, refresh_token: string, user: User }> {
+    // allow login by email or username using the `identifier` field
+    const identifier = loginDto.identifier;
+
     const user = await this.userRepository.findOne({
-      where: {
-        email: loginDto.email,
-        deletedAt: IsNull()
-      }
+      where: [
+        { email: identifier, deletedAt: IsNull() },
+        { username: identifier, deletedAt: IsNull() }
+      ]
     });
-    
+
     if (!user || !(await user.validatePassword(loginDto.password))) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
@@ -70,5 +73,22 @@ export class AuthService {
     return await this.userRepository.findOne({
       where: { id: payload.sub }
     });
+  }
+
+  public async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const ok = await user.validatePassword(currentPassword);
+    if (!ok) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+    user.password = newPassword;
+    // BeforeInsert won't run; hash manually
+    user.password = await (await import('bcryptjs')).hash(newPassword, 10);
+    await this.userRepository.save(user);
+    // return minimal response
+    return { message: 'Password updated' };
   }
 }
