@@ -9,13 +9,15 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
-  Logger
+  Logger,
+  Put
 } from '@nestjs/common';
 import { RentsService } from './rents.service';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { UpdateRentDto } from './dto/update-rent.dto';
 import { Rent } from './entities/rent.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @Controller('rents')
 export class RentsController {
@@ -68,7 +70,20 @@ export class RentsController {
     }
   }
 
-  @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/user/:id')
+  public async getAllByUserID(@Param('id') id: string): Promise<Rent[]> {
+    try {
+      return this.rentsService.findByUserID(id);
+    } catch (e) {
+      throw new HttpException(
+        'Error al actualizar la renta',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Put()
   public async update(
     @Body() updateRentDto: UpdateRentDto
   ) {
