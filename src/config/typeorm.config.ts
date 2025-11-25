@@ -2,7 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const port: number = parseInt(<string>process.env.PORT) || 3306;
+const port: number = parseInt(<string>process.env.MYSQL_PORT) || 3306;
 
 export const typeormConnectionConfig: TypeOrmModuleOptions = {
     type: 'mysql',
